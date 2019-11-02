@@ -1,0 +1,21 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/bionic64"
+  config.vm.box_version = "20190724.1.0"
+  config.vm.synced_folder ".", "/vagrant"
+  config.vm.provision "shell", :path => "common/install_common.sh"
+
+  config.vm.define :prometheus do |s|
+    s.vm.hostname = "prometheus"
+    s.vm.network :private_network, ip: "172.10.23.12"
+    s.vm.provider :virtualbox do |vb|
+        vb.customize ["modifyvm", :id, "--memory", "4096"]
+    end
+    s.vm.provision "shell", :path => "prometheus/install_prometheus_grafana.sh"
+  end
+
+  config.vm.define :goExporter do |ge|
+    ge.vm.hostname = "goExporter"
+    ge.vm.network :private_network, ip: "172.10.23.13"
+    ge.vm.provision "shell", :path => "goExporter/scripts/install_goExporter.sh"
+  end
+end
